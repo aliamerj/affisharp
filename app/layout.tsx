@@ -5,6 +5,7 @@ import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Navbar } from "@/components/globle/navbar";
+import { ToastContainer } from "react-toastify";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,6 +32,7 @@ export default function RootLayout({
         <body className={inter.className}>
           <Navbar />
           {children}
+          <ToastContainer />
         </body>
       </html>
     </ClerkProvider>

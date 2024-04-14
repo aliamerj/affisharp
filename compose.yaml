@@ -1,0 +1,54 @@
+version: "3.8"
+services:
+  server:
+    build:
+      context: ./api
+      target: dev
+    ports:
+      - 8080:8080
+   # Comment out or remove the volume mount for production
+    volumes:
+       - ./api:/server
+    env_file:
+      - .env
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:14.11
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  client:
+    build:
+      context: .
+      target: dev
+    env_file:
+      - .env
+    environment:
+      SERVER_URL: ${SERVER_URL}
+    ports:
+      - 3000:3000
+    # Comment out or remove the volume mount for production
+    volumes:
+      - .:/usr/src/app
+      - /app/node_modules
+volumes:
+  db-data:
+
+
