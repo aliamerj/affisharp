@@ -9,11 +9,16 @@ import (
 func NewRouter() *gin.Engine {
 	// Set the router as the default one shipped with Gin
 	router := gin.Default()
-	expectedHost := "localhost:8080"
+	allowedHosts := map[string]bool{
+		"localhost:8080":    true, // Allowed in development
+		"server:8080":       true,
+		"affisharp.com":     true, // Allowed in production
+		"www.affisharp.com": true, // Allowed in production
+	}
 
 	// Setup Security Headers
 	router.Use(func(c *gin.Context) {
-		if c.Request.Host != expectedHost {
+		if _, valid := allowedHosts[c.Request.Host]; !valid {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid host header"})
 			return
 		}

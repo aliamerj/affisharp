@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"net/http"
-
 	"github.com/aliamerj/affisharp/apk/controllers"
 	"github.com/aliamerj/affisharp/middleware"
 	"github.com/gin-gonic/gin"
@@ -12,13 +10,17 @@ import (
 func RegisterCompanyRoutes(router *gin.RouterGroup, db *gorm.DB) {
 	conpanyGroup := router.Group("/company")
 	{
-		conpanyGroup.GET("/", middleware.ClerkAuthMiddleware(), func(ctx *gin.Context) {
-			ctx.JSON(http.StatusCreated, gin.H{"message": "Company registered successfully"})
 
+		conpanyGroup.GET("/validate", middleware.ClerkAuthMiddleware(), func(ctx *gin.Context) {
+			controllers.ValidateUsername(ctx, db)
 		})
 
 		conpanyGroup.POST("/", middleware.ClerkAuthMiddleware(), func(ctx *gin.Context) {
 			controllers.CreateNewCompany(ctx, db)
+		})
+
+		conpanyGroup.GET("/view", func(ctx *gin.Context) {
+			controllers.CompanyByUserId(ctx, db)
 		})
 
 	}

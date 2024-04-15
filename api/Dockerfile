@@ -1,7 +1,7 @@
 FROM golang:1.22.2-alpine3.19 AS base
 
 WORKDIR /server
-
+EXPOSE 8080
 # Install Git and any other necessary packages
 RUN apk add --no-cache git
 
