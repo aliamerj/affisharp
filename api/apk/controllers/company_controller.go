@@ -14,19 +14,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	uni      *ut.UniversalTranslator
-	validate *validator.Validate
-)
-
-func validationMessage() ut.Translator {
-	en := en.New()
-	uni = ut.New(en, en)
-	trans, _ := uni.GetTranslator("en")
-	en_translations.RegisterDefaultTranslations(validate, trans)
-	return trans
-}
-
 func CreateNewCompany(c *gin.Context, db *gorm.DB) {
 	validate := validator.New()
 	en := en.New()

@@ -23,8 +23,6 @@ import {
 } from "@/components/ui/form";
 import { useTransition } from "react";
 import { OnboardingSchema } from "@/schemas/onboarding_schema";
-import { Textarea } from "../ui/textarea";
-import { ImageField } from "./fields/ImageField";
 import { useSession } from "@clerk/nextjs";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -38,10 +36,7 @@ export const OnboardingForm = () => {
   const form = useForm<z.infer<typeof OnboardingSchema>>({
     resolver: zodResolver(OnboardingSchema),
     defaultValues: {
-      userId: "",
-      name: "",
       username: "",
-      description: "",
     },
   });
 
@@ -60,7 +55,9 @@ export const OnboardingForm = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify({
+            username: data.username.replace(/\s+/g, "-"),
+          }),
         });
         const body = await res.json();
         if (!res.ok) {
@@ -110,17 +107,17 @@ export const OnboardingForm = () => {
     }
   };
   return (
-    <div className="py-5">
-      <Card className="w-full mx-auto max-w-4xl drop-shadow-xl">
+    <div className="flex justify-center items-center h-[85vh]">
+      <Card className="w-full mx-auto max-w-2xl drop-shadow-xl">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">
-            Company Onboarding Form
+            Company Onboarding
           </CardTitle>
           <CardDescription>
-            Set up your affiliate account by entering your company information
-            below. This will enable you to integrate your CRM system, manage
-            affiliate links, and track referrals efficiently. Complete the form
-            to get started with optimizing your affiliate marketing efforts.
+            Create a unique username for your company to personalize your
+            affiliate links, making them easily identifiable. This username will
+            be featured in all your custom URLs, enhancing brand visibility and
+            trust.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -131,30 +128,10 @@ export const OnboardingForm = () => {
             >
               <FormField
                 control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="name">Company Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        id="name"
-                        type="text"
-                        placeholder="AffiSharp"
-                        required
-                        disabled={isPending}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="username">Company UserName</FormLabel>
+                    <FormLabel htmlFor="username">Company Username</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -170,30 +147,8 @@ export const OnboardingForm = () => {
                   </FormItem>
                 )}
               />
-              <ImageField control={form.control} />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="description">
-                      Motivation Description
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        id="description"
-                        placeholder="Type your motivation description here"
-                        required
-                        disabled={isPending}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <Button type="submit" className="w-full" disabled={isPending}>
-                Create a Company
+                Create a Username
               </Button>
             </form>
           </Form>

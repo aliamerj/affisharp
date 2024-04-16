@@ -24,7 +24,7 @@ func main() {
 	}
 
 	// Automatically migrate multiple schemas
-	err = db.AutoMigrate(&modules.Company{})
+	err = db.AutoMigrate(&modules.Company{}, &modules.Deal{})
 	if err != nil {
 		log.Fatalf("Could not migrate database: %v", err)
 	}
@@ -35,6 +35,7 @@ func main() {
 	api := router.Group("/api")
 	{
 		routes.RegisterCompanyRoutes(api, db)
+		routes.RegisterDealRoutes(api, db)
 
 	}
 

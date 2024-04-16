@@ -1,21 +1,11 @@
 import Link from "next/link";
 import { Menu } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "../ui/button";
 import Image from "next/image";
-import { SignOutButton, currentUser } from "@clerk/nextjs";
+import { UserAvatar } from "../custom/avatar";
 
 export const Navbar = async () => {
-  const sesstion = await currentUser();
   return (
     <header className="sticky top-0 flex h-24 items-center justify-between md:gap-4 border-b bg-background px-4 md:px-6 shadow-md">
       <div className="flex flex-row-reverse items-center md:flex-row md:flex-1 md:justify-evenly gap-5">
@@ -107,39 +97,7 @@ export const Navbar = async () => {
         </Sheet>
       </div>
       <div className="pt-4 px-5">
-        {sesstion ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="secondary"
-                size="icon"
-                className="rounded-full w-10 h-10"
-              >
-                <Avatar className="border-2">
-                  <AvatarImage
-                    src={sesstion.imageUrl}
-                    alt={sesstion.firstName || "User"}
-                  />
-                  <AvatarFallback>{sesstion.firstName}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <SignOutButton />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <Button asChild size="lg">
-            <Link href="sign-in">Login</Link>
-          </Button>
-        )}
+        <UserAvatar />
       </div>
     </header>
   );

@@ -12,7 +12,6 @@ export const getComapnyByUserId = async (
   });
   if (!res.ok) return null;
   const body = await res.json();
-  console.log(body);
   const validate = CompanySchema.safeParse(body.body);
   if (!validate.success) return null;
   return validate.data;
