@@ -29,7 +29,7 @@ export function DealCard({ deal }: { deal: z.infer<typeof DealsQuerySchema> }) {
       <CardHeader className="bg-gradient-to-r from-purple-500 to-indigo-500 p-4 text-white">
         <div className="flex justify-between">
           <CardTitle className="text-3xl">{deal.name}</CardTitle>
-          <Link href={`/${deal.CompanyID}/${deal.name}`} target="_blank">
+          <Link href={`/${deal.CompanyID}/${deal.name}`}>
             <ExternalLink className="text-4xl" />
           </Link>
         </div>
@@ -38,9 +38,16 @@ export function DealCard({ deal }: { deal: z.infer<typeof DealsQuerySchema> }) {
         <Avatar className="mb-4">
           <AvatarImage src={deal.logo ?? ""} alt={deal.name} />
           <AvatarFallback>
-            <HandshakeIcon className="text-gray-400" />
+            <HandshakeIcon className="text-gray-600 text-lg w-10 h-10" />
           </AvatarFallback>
         </Avatar>
+        <Link
+          href={deal.link}
+          className="text-sm underline text-primary italic"
+          target="_blank"
+        >
+          {deal.link}
+        </Link>
         <div className="text-center text-sm text-gray-600">
           Created: {new Date(deal.CreatedAt).toLocaleDateString()}{" "}
           {new Date(deal.CreatedAt).toLocaleTimeString()}

@@ -39,6 +39,7 @@ export const DealForm = ({
     resolver: zodResolver(DealSchema),
     defaultValues: {
       name: "",
+      link: "",
     },
   });
   const onSubmit = (data: z.infer<typeof DealSchema>) => {
@@ -135,7 +136,27 @@ export const DealForm = ({
               </FormItem>
             )}
           />
-          <ImageField control={form.control} />
+          <FormField
+            control={form.control}
+            name="link"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="link">Affiliate To</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    id="link"
+                    type="url"
+                    placeholder="https://example.com/call"
+                    required
+                    disabled={isPending}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <ImageField form={form} />
           <Button type="submit" className="w-full" disabled={isPending}>
             Start creating deals now!
           </Button>

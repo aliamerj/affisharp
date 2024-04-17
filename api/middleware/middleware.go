@@ -41,6 +41,35 @@ func ClerkAuthMiddleware() gin.HandlerFunc {
 	}
 }
 
+func ClerkCheckAuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		clerkAPIKey := os.Getenv("CLERK_SECRET_KEY")
+		if clerkAPIKey == "" {
+			panic("CLERK_API_KEY must be set")
+		}
+		apiPem := os.Getenv("PEM_PUBLIC_KEY")
+		if apiPem == "" {
+			panic("PEM_PUBLIC_KEY must be set")
+		}
+
+		jsonWebkey, err := clerk.JSONWebKeyFromPEM(apiPem)
+
+		sessionToken := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
+
+		claims, err := jwt.Verify(c.Request.Context(), &jwt.VerifyParams{
+			Token: sessionToken,
+			JWK:   jsonWebkey,
+		})
+		if err != nil {
+			c.Set("userId", "")
+			c.Next()
+			return
+		}
+		c.Set("userId", claims.Subject)
+		c.Next()
+	}
+}
+
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		clientURL := os.Getenv("CLIENT_URL")

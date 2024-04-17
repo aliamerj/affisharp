@@ -7,7 +7,11 @@ import { NextResponse } from "next/server";
 export default authMiddleware({
   // Allow signed out users to access the specified routes:
   publicRoutes(req) {
-    if (req.nextUrl.pathname === "/") {
+    if (
+      req.nextUrl.pathname === "/" ||
+      req.nextUrl.pathname === "/sign-in" ||
+      req.nextUrl.pathname === "/sign-up"
+    ) {
       return true;
     }
 
@@ -21,11 +25,20 @@ export default authMiddleware({
     return false;
   },
   async afterAuth(auth, req, _) {
-    // Handle users who aren't authenticated
     if (!auth.userId && !auth.isPublicRoute) {
       return redirectToSignIn({ returnBackUrl: req.url });
     }
-    const company = auth.userId ? await getComapnyByUserId(auth.userId) : null;
+    if (auth.userId && req.nextUrl.pathname === "/") {
+      const creatUsername = new URL("/dashboard", req.url);
+      return NextResponse.redirect(creatUsername);
+    }
+    let company = null;
+    try {
+      company = auth.userId ? await getComapnyByUserId(auth.userId) : null;
+    } catch (_) {
+      company = null;
+    }
+
     if (
       !auth.isPublicRoute &&
       auth.userId &&
@@ -51,7 +64,6 @@ export default authMiddleware({
         });
       }
     }
-    console.log("this is public");
     // Allow users visiting public routes to access them
     return NextResponse.next();
   },

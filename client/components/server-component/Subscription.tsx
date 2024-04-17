@@ -1,11 +1,10 @@
 import React from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GenerateAffilateBtn } from "@/components/generateAffilateBtn/GenerateAffilateBtn";
 import { HandshakeIcon } from "lucide-react";
 import { getDealByCompanyDeal } from "@/lib/api_handler/get_deal";
 import { notFound } from "next/navigation";
+import { auth } from "@clerk/nextjs";
 
 export const Subscription = async ({
   company,
@@ -14,7 +13,13 @@ export const Subscription = async ({
   company: string;
   deal: string;
 }) => {
-  const targetDeal = await getDealByCompanyDeal(company, deal);
+  const { getToken } = auth();
+
+  const targetDeal = await getDealByCompanyDeal(
+    company,
+    deal,
+    await getToken(),
+  );
   if (!targetDeal) return notFound();
   return (
     <div className="bg-white/30 backdrop-blur-lg p-8 rounded-xl shadow-xl border border-white/60 max-w-md w-full text-center">
@@ -32,7 +37,12 @@ export const Subscription = async ({
         {targetDeal.CompanyID.charAt(0).toUpperCase() +
           targetDeal.CompanyID.slice(1)}
       </p>
-      <GenerateAffilateBtn />
+
+      <GenerateAffilateBtn
+        affilink={targetDeal.affilink}
+        company={company}
+        deal={deal}
+      />
     </div>
   );
 };

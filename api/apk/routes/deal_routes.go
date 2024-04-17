@@ -16,7 +16,7 @@ func RegisterDealRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		dealGroup.GET("/", func(ctx *gin.Context) {
 			controllers.DealsByCompanyUsername(ctx, db)
 		})
-		dealGroup.GET("/:company/:deal", func(ctx *gin.Context) {
+		dealGroup.GET("/:company/:deal", middleware.ClerkCheckAuthMiddleware(), func(ctx *gin.Context) {
 			controllers.DealByCompanyDealName(ctx, db)
 
 		})

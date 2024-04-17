@@ -9,12 +9,12 @@ import { Input } from "@/components/ui/input";
 import { DealSchema } from "@/schemas/deal_schema";
 import Image from "next/image";
 import React, { ChangeEvent, useState } from "react";
-import { Control } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
-type Controler = z.infer<typeof DealSchema>;
+type FormData = z.infer<typeof DealSchema>;
 
-export const ImageField = ({ control }: { control: Control<Controler> }) => {
+export const ImageField = ({ form }: { form: UseFormReturn<FormData> }) => {
   const [inputUrl, setInputUrl] = useState("");
   const [validImageUrl, setValidImageUrl] = useState<string | null>(null);
 
@@ -26,6 +26,14 @@ export const ImageField = ({ control }: { control: Control<Controler> }) => {
     } else {
       setValidImageUrl(null);
     }
+    if (url && !validImageUrl) {
+      form.setError("logo", {
+        message: "Invalid url Image",
+        type: "validate",
+      });
+    } else {
+      form.clearErrors("logo");
+    }
   };
 
   function isValidUrl(url: string) {
@@ -34,7 +42,7 @@ export const ImageField = ({ control }: { control: Control<Controler> }) => {
   return (
     <div className="md:flex md:items-center md:justify-between">
       <FormField
-        control={control}
+        control={form.control}
         name="logo"
         render={({ field }) => (
           <FormItem className="flex-1">
@@ -61,6 +69,7 @@ export const ImageField = ({ control }: { control: Control<Controler> }) => {
             objectFit="cover"
             width={100}
             height={100}
+            onError={(_) => setValidImageUrl(null)}
           />
         ) : (
           <div className="text-gray-400 flex justify-center items-center w-full h-full">

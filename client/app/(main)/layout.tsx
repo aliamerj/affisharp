@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toaster";
 import { ToastContainer } from "react-toastify";
 
 export const metadata = {
@@ -15,6 +16,7 @@ export default function RootLayout({
       <body>
         <ToastContainer />
         {children}
+        <Toaster />
       </body>
     </html>
   );

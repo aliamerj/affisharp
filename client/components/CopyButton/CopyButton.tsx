@@ -17,7 +17,12 @@ export const CopyButton = ({ text }: { text: string }) => {
   };
 
   return (
-    <Button type="button" size="sm" className="w-full sm:w-auto" onClick={copy}>
+    <Button
+      type="button"
+      size="sm"
+      className="w-full h-full md:w-auto p-3"
+      onClick={copy}
+    >
       {isCopied ? (
         <CheckCheck className="h-4 w-4" />
       ) : (

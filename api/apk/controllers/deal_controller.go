@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -22,6 +23,7 @@ func CreateNewDeal(c *gin.Context, db *gorm.DB) {
 	trans, _ := uni.GetTranslator("en")
 	en_translations.RegisterDefaultTranslations(validate, trans)
 	userId := c.GetString("userId")
+	fmt.Printf("this is userId: %s", userId)
 	if userId == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorize Request"})
 		return
@@ -98,31 +100,78 @@ func DealsByCompanyUsername(c *gin.Context, db *gorm.DB) {
 	return
 }
 
+type AffiliateRes struct {
+	Link  string
+	Error error
+}
+
 func DealByCompanyDealName(c *gin.Context, db *gorm.DB) {
 	validate := validator.New()
 	en := en.New()
 	uni = ut.New(en, en)
 	trans, _ := uni.GetTranslator("en")
 	company := c.Param("company")
-	deal := c.Param("deal")
+	dealName := c.Param("deal")
+	userId := c.GetString("userId")
+	fmt.Printf("userId %s", userId)
 
 	en_translations.RegisterDefaultTranslations(validate, trans)
-	if company == "" || deal == "" {
+	if company == "" || dealName == "" {
 		c.JSON(http.StatusNotFound, gin.H{"message": "404 NOT FOUND"})
 		return
 	}
+	affiChan := make(chan *AffiliateRes)
+	if userId != "" {
+		go getAffiLink(userId, dealName, company, db, affiChan)
 
-	var deals modules.Deal
-	if res := db.Where(&modules.Deal{CompanyID: company, Name: deal}).First(&deals); res.Error != nil {
-		if res.Error == gorm.ErrRecordNotFound {
+	}
+
+	var deal modules.Deal
+	if err := db.Where(&modules.Deal{CompanyID: company, Name: dealName}).First(&deal).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"message": "NOT Found"})
 			return
 		}
 
-		c.JSON(http.StatusBadRequest, gin.H{"message": res.Error.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Company Found", "body": deals})
+	result := <-affiChan
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusOK, gin.H{"message": "Company Found", "body": deal, "affilink": nil})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"message": result.Error.Error()})
+		return
+
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Company Found", "body": deal, "affilink": result.Link})
 	return
 
+}
+
+func getAffiLink(userId string, dealName string, companyName string, db *gorm.DB, affiChan chan *AffiliateRes) {
+	validate := validator.New()
+	en := en.New()
+	uni = ut.New(en, en)
+	trans, _ := uni.GetTranslator("en")
+	en_translations.RegisterDefaultTranslations(validate, trans)
+
+	var affi modules.Affiliate
+	var deal modules.Deal
+
+	if err := db.Where(&modules.Deal{Name: dealName, CompanyID: companyName}).First(&deal).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			affiChan <- &AffiliateRes{Link: "", Error: err}
+		}
+		affiChan <- &AffiliateRes{Link: "", Error: err}
+	}
+
+	if err := db.Where(&modules.Affiliate{DealID: deal.ID, UserID: userId}).First(&affi).Error; err != nil {
+		affiChan <- &AffiliateRes{Link: "", Error: err}
+	}
+	affiSharp := fmt.Sprintf("https://affisharp.com/affi/%d", affi.ID)
+	affiChan <- &AffiliateRes{Link: affiSharp, Error: nil}
 }
