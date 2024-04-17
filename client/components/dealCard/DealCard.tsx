@@ -29,7 +29,7 @@ export function DealCard({ deal }: { deal: z.infer<typeof DealsQuerySchema> }) {
       <CardHeader className="bg-gradient-to-r from-purple-500 to-indigo-500 p-4 text-white">
         <div className="flex justify-between">
           <CardTitle className="text-3xl">{deal.name}</CardTitle>
-          <Link href={`/${deal.CompanyID}/${deal.name}`}>
+          <Link href={`/${deal.CompanyID}/${deal.name}`} target="_blank">
             <ExternalLink className="text-4xl" />
           </Link>
         </div>

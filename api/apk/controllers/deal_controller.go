@@ -97,3 +97,32 @@ func DealsByCompanyUsername(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{"message": "Company Found", "body": deals})
 	return
 }
+
+func DealByCompanyDealName(c *gin.Context, db *gorm.DB) {
+	validate := validator.New()
+	en := en.New()
+	uni = ut.New(en, en)
+	trans, _ := uni.GetTranslator("en")
+	company := c.Param("company")
+	deal := c.Param("deal")
+
+	en_translations.RegisterDefaultTranslations(validate, trans)
+	if company == "" || deal == "" {
+		c.JSON(http.StatusNotFound, gin.H{"message": "404 NOT FOUND"})
+		return
+	}
+
+	var deals modules.Deal
+	if res := db.Where(&modules.Deal{CompanyID: company, Name: deal}).First(&deals); res.Error != nil {
+		if res.Error == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"message": "NOT Found"})
+			return
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{"message": res.Error.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Company Found", "body": deals})
+	return
+
+}

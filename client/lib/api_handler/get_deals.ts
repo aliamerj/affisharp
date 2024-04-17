@@ -13,9 +13,7 @@ export const getDealsByCompanyName = async (
   });
   if (!res.ok) return [];
   const body = await res.json();
-  console.log(body);
   const validate = DealsSchema.safeParse(body.body);
-  console.log(validate);
   if (!validate.success) return [];
   return validate.data;
 };

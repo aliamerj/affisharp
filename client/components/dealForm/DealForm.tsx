@@ -105,7 +105,7 @@ export const DealForm = ({
         <p className="text-sm font-bold">Deal Link</p>
         <Badge variant="outline" className="max-w-full overflow-hidden pr-2">
           <p className="text-sm font-normal italic">
-            {`https://affisharp.com/${company}/${form.watch("name") === "" ? "Deal_Name" : truncateText(form.watch("name"))} `}
+            {`https://affisharp.com/${company}/${form.watch("name") === "" ? "Deal-Name" : truncateText(form.watch("name"))} `}
           </p>
         </Badge>
       </div>
@@ -125,7 +125,7 @@ export const DealForm = ({
                     {...field}
                     id="name"
                     type="text"
-                    placeholder="Book Call"
+                    placeholder="Book-Call"
                     required
                     disabled={isPending}
                     onBlur={(e) => handleDealValidation(e.target.value)}

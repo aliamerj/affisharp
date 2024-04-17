@@ -5,12 +5,11 @@ import { DashboardNavbar } from "@/components/globle/DashboardNavbar";
 import Image from "next/image";
 import { GoProCard } from "@/components/custom/GoProCard";
 import { Deals } from "@/components/deals/Deals";
-import { currentUser } from "@clerk/nextjs";
-import { getComapnyByUserId } from "@/lib/api_handler/get_company";
-import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { Suspense } from "react";
+import Spinner from "@/components/globle/Spinner";
 
 export default async function Dashboard({
-
   searchParams,
 }: {
   searchParams: { page: string };
@@ -18,12 +17,8 @@ export default async function Dashboard({
   const { page } = searchParams;
   const activeProps = "bg-muted text-primary";
   const unactiveProps = "text-muted-foreground";
-
-
-  const user = await currentUser();
-  const company = user ? await getComapnyByUserId(user.id) : null;
-  if(!company) return redirect("/")
-
+  const headersList = headers();
+  const companyID = headersList.get("company");
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -64,7 +59,13 @@ export default async function Dashboard({
       </div>
       <div className="flex flex-col">
         <DashboardNavbar />
-        {page === "deals" ? <Deals companyID={company.username}/> : <h1>other one</h1>}
+        {page === "deals" ? (
+          <Suspense fallback={<Spinner />}>
+            <Deals companyID={companyID} />
+          </Suspense>
+        ) : (
+          <h1>other one</h1>
+        )}
       </div>
     </div>
   );

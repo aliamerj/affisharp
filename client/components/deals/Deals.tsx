@@ -2,8 +2,8 @@ import { getDealsByCompanyName } from "@/lib/api_handler/get_deals";
 import { NewDealBtn } from "../newDealBtn/NewDealBtn";
 import { DealCard } from "../dealCard/DealCard";
 
-export const Deals = async ({ companyID }: { companyID: string }) => {
-  const deals = await getDealsByCompanyName(companyID);
+export const Deals = async ({ companyID }: { companyID: string | null }) => {
+  const deals = companyID ? await getDealsByCompanyName(companyID) : [];
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">
@@ -12,7 +12,9 @@ export const Deals = async ({ companyID }: { companyID: string }) => {
           <h1 className="text-lg font-semibold md:text-2xl lg:text-3xl">
             Deals
           </h1>
-          {deals.length > 0 && <NewDealBtn currentDeals={deals} />}
+          {deals.length > 0 && (
+            <NewDealBtn currentDeals={deals} company={companyID} />
+          )}
         </div>
       </div>
       <div
@@ -36,7 +38,7 @@ export const Deals = async ({ companyID }: { companyID: string }) => {
               You have no Deals
             </h3>
             <p className="text-sm text-gray-500">Create new affiliate Link</p>
-            <NewDealBtn currentDeals={deals} />
+            <NewDealBtn currentDeals={deals} company={companyID} />
           </div>
         )}
       </div>

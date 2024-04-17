@@ -8,13 +8,17 @@ import (
 )
 
 func RegisterDealRoutes(router *gin.RouterGroup, db *gorm.DB) {
-	conpanyGroup := router.Group("/deal")
+	dealGroup := router.Group("/deal")
 	{
-		conpanyGroup.POST("/", middleware.ClerkAuthMiddleware(), func(ctx *gin.Context) {
+		dealGroup.POST("/", middleware.ClerkAuthMiddleware(), func(ctx *gin.Context) {
 			controllers.CreateNewDeal(ctx, db)
 		})
-		conpanyGroup.GET("/", func(ctx *gin.Context) {
+		dealGroup.GET("/", func(ctx *gin.Context) {
 			controllers.DealsByCompanyUsername(ctx, db)
+		})
+		dealGroup.GET("/:company/:deal", func(ctx *gin.Context) {
+			controllers.DealByCompanyDealName(ctx, db)
+
 		})
 
 	}
